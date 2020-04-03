@@ -1,22 +1,26 @@
 <template>
   <div id="app">
-    <div class="container">
+    <div id="container">
       <!--UPLOAD-->
       <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
-        <h4>Select Target Stream to upload to</h4>
-        <label for="streamSelect">Target Stream &nbsp</label>
-        <select name="streamSelect">
-          <option v-for="stream in streams">{{ stream }}</option>
-        </select>
-        <h4>Upload Files</h4>
-        <div class="dropbox">
+        <div id="sb" class="selectbar">
+          <select id="ss" name="streamSelect">
+            <option v-for="stream in streams">{{ stream }}</option>
+          </select>
+          <input type="text" value="tag 1">
+          <input type="text" value="tag 2">
+          <input type="text" value="tag 3">
+          <input type="text" value="tag 4">
+          <input type="text" value="tag 5">
+        </div>
+        <div id="db" class="dropbox">
           <input
             type="file"
             multiple
             :name="uploadFieldName"
             :disabled="isSaving"
             @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
-            accept="image/*"
+            accept="*"
             class="input-file"
           >
           <p v-if="isInitial">Drag files here to begin
@@ -52,8 +56,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
 <script>
 // swap as you need
-import { upload } from "./file-upload.fake.service"; // fake service
-// import { upload } from './file-upload.service';   // real service
+//import { upload } from "./file-upload.fake.service"; // fake service
+import { upload } from "./file-upload.service"; // real service
 import { wait } from "./utils";
 import axios from "axios";
 
@@ -137,8 +141,26 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.dropbox {
+<style>
+#app {
+  background-color: lightgreen;
+  margin: 50px;
+}
+
+#container {
+  background: lightcoral;
+  width: 70%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+#sb {
+  background: lightgray;
+  float: left;
+  width: 150px;
+}
+
+#db {
   outline: 2px dashed grey; /* the dash box */
   outline-offset: -10px;
   background: lightcyan;
@@ -147,6 +169,13 @@ export default {
   min-height: 200px; /* minimum height */
   position: relative;
   cursor: pointer;
+  margin-left: 150px;
+}
+
+#ss {
+  background: lightgray;
+  text-align: right;
+  width: 150px;
 }
 
 .input-file {
