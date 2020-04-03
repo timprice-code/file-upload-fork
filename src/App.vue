@@ -3,7 +3,8 @@
     <div class="container">
       <!--UPLOAD-->
       <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
-        <h4>Select Target Stream</h4>
+        <h4>Select Target Stream to upload to</h4>
+        <label for="streamSelect">Target Stream &nbsp</label>
         <select name="streamSelect">
           <option v-for="stream in streams">{{ stream }}</option>
         </select>
@@ -125,8 +126,10 @@ export default {
   },
   beforeMount() {
     axios
-      .get("https://api.coindesk.com/v1/bpi/currentprice.json")
-      .then(response => (this.streams = response.data.bpi.USD));
+      .get(
+        "https://hrgvfofszh.execute-api.us-east-1.amazonaws.com/develop/list-user-buckets"
+      )
+      .then(response => (this.streams = response.data.buckets));
   },
   mounted() {
     this.reset();
