@@ -1,15 +1,29 @@
-import * as axios from 'axios';
+import * as axios from "axios";
 
-const BASE_URL = 'http://localhost:3001';
+const GET_PRESIGN_URL =
+  "https://hrgvfofszh.execute-api.us-east-1.amazonaws.com/develop/generate-presign-url";
 
-function upload(formData) {
-    const url = `${BASE_URL}/photos/upload`;
-    return axios.post(url, formData)
-        // get data
-        .then(x => x.data)
-        // add url field
-        .then(x => x.map(img => Object.assign({},
-            img, { url: `${BASE_URL}/images/${img.id}` })));
+function getSignedUrl() {
+  const url = `${GET_PRESIGN_URL}`;
+  const content = { bucket_name: "wc-ingest-tool", file_name: "testfile.file" };
+  const config = { headers: { "Content-Type": "application/json" } };
+  return axios.put(url, content, config).then(x => x.data);
 }
 
-export { upload }
+function upload(formData, presignedUrl) {
+  console.log(presignedUrl);
+  console.log(formData);
+
+  const url = presignedUrl;
+
+  return (
+    axios
+      .put(url, formData)
+      // get data
+      .then(x => x.data)
+      // add url field
+      .then(x => x.map(f => Object.assign({}, f, { url: presignedUrl })))
+  );
+}
+
+export { getSignedUrl, upload };

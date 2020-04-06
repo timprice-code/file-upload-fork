@@ -5,13 +5,13 @@
       <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
         <div id="sb" class="selectbar">
           <select id="ss" name="streamSelect">
-            <option v-for="stream in streams">{{ stream }}</option>
+            <option class="select-option" v-for="stream in streams">{{ stream }}</option>
           </select>
-          <input type="text" value="tag 1">
-          <input type="text" value="tag 2">
-          <input type="text" value="tag 3">
-          <input type="text" value="tag 4">
-          <input type="text" value="tag 5">
+          <input class="text-box" type="text" value="tag 1">
+          <input class="text-box" type="text" value="tag 2">
+          <input class="text-box" type="text" value="tag 3">
+          <input class="text-box" type="text" value="tag 4">
+          <input class="text-box" type="text" value="tag 5">
         </div>
         <div id="db" class="dropbox">
           <input
@@ -58,6 +58,7 @@
 // swap as you need
 //import { upload } from "./file-upload.fake.service"; // fake service
 import { upload } from "./file-upload.service"; // real service
+import { getSignedUrl } from "./file-upload.service";
 import { wait } from "./utils";
 import axios from "axios";
 
@@ -74,7 +75,8 @@ export default {
       uploadError: null,
       currentStatus: null,
       uploadFieldName: "photos",
-      streams: null
+      streams: null,
+      presignedUrl: null
     };
   },
   computed: {
@@ -102,16 +104,19 @@ export default {
       // upload data to the server
       this.currentStatus = STATUS_SAVING;
 
-      upload(formData)
-        .then(wait(1500)) // DEV ONLY: wait for 1.5s
-        .then(x => {
-          this.uploadedFiles = [].concat(x);
-          this.currentStatus = STATUS_SUCCESS;
-        })
-        .catch(err => {
-          this.uploadError = err.response;
-          this.currentStatus = STATUS_FAILED;
-        });
+      getSignedUrl().then(x => {
+        this.presignedUrl = x.upload_url;
+        upload(formData, this.presignedUrl)
+          .then(wait(1500)) // DEV ONLY: wait for 1.5s
+          .then(x => {
+            this.uploadedFiles = [].concat(x);
+            this.currentStatus = STATUS_SUCCESS;
+          })
+          .catch(err => {
+            this.uploadError = err.response;
+            this.currentStatus = STATUS_FAILED;
+          });
+      });
     },
     filesChange(fieldName, fileList) {
       // handle file changes
@@ -142,22 +147,41 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: rgb(50, 50, 50);
+}
+
 #app {
-  background-color: lightgreen;
+  background-color: rgb(50, 50, 50);
   margin: 50px;
 }
 
 #container {
-  background: lightcoral;
+  background: rgb(50, 50, 50);
   width: 70%;
   margin: 0 auto;
   overflow: hidden;
 }
 
 #sb {
-  background: lightgray;
+  background: rgb(50, 50, 50);
   float: left;
   width: 150px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.select-option {
+  background: rgb(50, 50, 50);
+  color: #fff;
+}
+
+.text-box {
+  background: rgb(50, 50, 50);
+  color: #fff;
+  width: 145px;
+  margin-top: 10px;
 }
 
 #db {
@@ -169,7 +193,8 @@ export default {
   min-height: 200px; /* minimum height */
   position: relative;
   cursor: pointer;
-  margin-left: 150px;
+  margin-left: 170px;
+  margin-top: 10px;
 }
 
 #ss {
